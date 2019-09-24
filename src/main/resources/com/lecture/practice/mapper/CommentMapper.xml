@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lecture.practice.mapper.MemberMapper">
+
+
+	<select id="getCommentList" resultType="com.lecture.practice.domain.CommentVO">
+		SELECT c.content, c.content_id
+		FROM comment c, board b
+		WHERE c.board_id = b.board_id
+		AND b.board_id = #{board_id}
+	</select>
+
+	<insert id="comment_wirte" >
+		<![CDATA[
+		INSERT into board_comment( comment_id, content, baord_id, id )
+		VALUES ( #{comment_id}, #{content}, #{baord_id}, #{id} )
+		]]>
+	</insert>
+
+	<update id="comment_delete" >
+		<![CDATA[
+		update board_comment
+		SET is_delete = '1'
+		WHERE comment_id = #{comment_id}
+		]]>
+	</update>
+	
+	<update id="comment_modify" >
+		<![CDATA[
+		update board_comment
+		SET content = #{content}
+		WHERE comment_id = #{comment_id}
+		]]>
+	</update>
+</mapper>
