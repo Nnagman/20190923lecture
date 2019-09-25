@@ -6,12 +6,25 @@
 
 
 	<select id="getBoardList" resultType="com.lecture.practice.domain.BoardVO">
-		SELECT * from board
+		SELECT * FROM board_view
+	</select>
+	
+	<select id="getCommentList" resultType="com.lecture.practice.domain.CommentVO">
+		SELECT *
+		FROM board_comment
+		WHERE board_id = #{board_id}
 	</select>
 
 	<insert id="board_write" >
 		<![CDATA[
 		INSERT INTO board( id, board_id, title, content ) VALUES ( #{id}, #{board_id}, #{title}, #{content} )
+		]]>
+	</insert>
+	
+	<insert id="comment_write">
+		<![CDATA[
+		INSERT INTO board_comment( comment_id, content, board_id, id ) 
+		VALUES ( #{comment_id}, #{content}, #{board_id}, #{id} )
 		]]>
 	</insert>
 	
@@ -23,9 +36,16 @@
 
 	<select id="board_detail" resultType="com.lecture.practice.domain.BoardVO">
 		<![CDATA[
-		SELECT b.id, b.board_id, b.title, b.content, f.file_name FROM board b, board_file f
-		WHERE b.board_id = f.board_id
-		ANd board_id = #{board_id}
+		SELECT id, board_id, title, content 
+		FROM board
+		WHERE board_id = #{board_id}
+  	  	]]>
+	</select>
+	
+	<select id="board_file_detail" resultType="com.lecture.practice.domain.BoardVO">
+		<![CDATA[
+		SELECT file_name FROM board_file
+		WHERE board_id = #{board_id}
   	  	]]>
 	</select>
 
@@ -37,6 +57,19 @@
 		]]>
 	</update>
 	
+	<update id="comment_delete" >
+		<![CDATA[
+		update board_comment
+		SET is_delete = '1'
+		WHERE comment_id = #{comment_id}
+		]]>
+	</update>
+	
+	<delete id="board_file_delete">
+		DELETE FROM board_file
+		WHERE file_name = #{file_name}
+	</delete>
+	
 	<update id="board_modify" >
 		<![CDATA[
 		update board
@@ -46,11 +79,25 @@
 		]]>
 	</update>
 	
-		<update id="board_file_modify" >
+	<update id="board_file_modify" >
 		<![CDATA[
-		update board_file
+		UPDATE board_file
 		SET file_name = #{file_name}
 		WHERE board_id = #{board_id}
+		]]>
+	</update>
+	
+	<update id="comment_modify" >
+		<![CDATA[
+		update board_comment
+		SET content = #{content}
+		WHERE comment_id = #{comment_id}
+		]]>
+	</update>
+	
+	<update id="board_count" >
+		<![CDATA[
+		INSERT INTO board_count( board_id, id ) VALUES ( #{board_id}, #{id} )
 		]]>
 	</update>
 </mapper>

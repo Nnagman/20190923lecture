@@ -6,9 +6,17 @@
 <title>board_register</title>
 </head>
 <body>
-	<a href="http://localhost:8080/">게시판</a>
-	<a href="http://localhost:8080/logout">로그아웃</a>
+	<%@ include file="header.jsp"%>
 	
 	<P>  Board Detail </P>
+	
+	<p>${board_detail.title}</p>
+	<div>${board_detail.content}</div>
+	
+	<form action="https://localhost:8080/comment_write" method="POST">
+		<input type="text" name="content" id="content"/>
+		<input type="hidden" name="board_id" id="${board_id}"/>
+		<input type="hidden" name="id" id="${member.id}"/>
+	</form>
 </body>
 </html>

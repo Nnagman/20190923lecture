@@ -6,8 +6,7 @@
 <title>register</title>
 </head>
 <body>
-	<a href="http://localhost:8080/">게시판</a>
-	<a href="http://localhost:8080/login">로그인</a>
+	<%@ include file="header.jsp"%>
 	
 	<P>  Register </P>
 	<form method="post" action="/register">

@@ -10,4 +10,5 @@ public class BoardVO {
 	private String content;
 	private String is_delete;
 	private String file_name;
+	private String count;
 }

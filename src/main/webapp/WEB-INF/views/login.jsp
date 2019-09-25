@@ -5,8 +5,7 @@
 	<title>Login</title>
 </head>
 <body>
-	<a href="http://localhost:8080/">게시판</a>
-	<a href="http://localhost:8080/register">회원가입</a>
+	<%@ include file="header.jsp"%>
 	
 	<P>  Login </P>
 	<form method="post" action="/login">

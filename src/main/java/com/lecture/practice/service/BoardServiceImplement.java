@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 import com.lecture.practice.domain.BoardVO;
+import com.lecture.practice.domain.CommentVO;
 
 @Service
 public class BoardServiceImplement implements BoardService {
@@ -24,10 +25,20 @@ public class BoardServiceImplement implements BoardService {
 	public List<BoardVO> getBoardList() throws Exception {
 		return sqlSession.selectList(NAMESPACE + ".getBoardList");
 	}
+	
+	@Override
+	public List<CommentVO> getCommentList() throws Exception {
+		return sqlSession.selectList(NAMESPACE + ".getCommentList");
+	}
 
 	@Override
 	public void board_write(BoardVO boardVO) throws Exception {
 		sqlSession.insert(NAMESPACE + ".board_write", boardVO);
+	}
+	
+	@Override
+	public void comment_write(CommentVO commentVO) throws Exception {
+		sqlSession.insert(NAMESPACE + ".comment_write", commentVO);
 	}
 
 	@Override
@@ -39,19 +50,47 @@ public class BoardServiceImplement implements BoardService {
 	public BoardVO board_detail(BoardVO boardVO) throws Exception {
 		return sqlSession.selectOne(NAMESPACE + ".board_detail", boardVO);
 	}
+	
+	@Override
+	public BoardVO board_file_detail(BoardVO boardVO) throws Exception {
+		return sqlSession.selectOne(NAMESPACE + ".board_file_detail", boardVO);
+	}
 
 	@Override
 	public void board_delete(BoardVO boardVO) throws Exception {
 		sqlSession.delete(NAMESPACE + ".board_delete", boardVO);
 	}
+	
+	@Override
+	public void comment_delete(CommentVO commentVO) throws Exception {
+		sqlSession.delete(NAMESPACE + ".comment_delete", commentVO);
+	}
+	
+	@Override
+	public void board_file_delete(BoardVO boardVO) throws Exception {
+		sqlSession.delete(NAMESPACE + ".board_file_delete", boardVO);
+	}
+	
 	@Override
 	public void board_modify(BoardVO boardVO) throws Exception {
 		sqlSession.update(NAMESPACE + ".board_modify", boardVO);
+	}
+	
+	@Override
+	public void comment_modify(CommentVO commentVO) throws Exception {
+		sqlSession.update(NAMESPACE + ".comment_modify", commentVO);
 	}
 
 	@Override
 	public void board_file_modify(BoardVO boardVO) throws Exception {
 		sqlSession.update(NAMESPACE + ".board_file_modify", boardVO);
+	}
+
+	@Override
+	public void board_count(BoardVO boardVO) {
+		try {
+			sqlSession.insert(NAMESPACE + ".board_count", boardVO);
+		}catch(Exception e) { }finally { }
 	}
 
 }
