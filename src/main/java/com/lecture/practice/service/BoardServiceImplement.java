@@ -27,8 +27,13 @@ public class BoardServiceImplement implements BoardService {
 	}
 	
 	@Override
-	public List<CommentVO> getCommentList() throws Exception {
-		return sqlSession.selectList(NAMESPACE + ".getCommentList");
+	public List<CommentVO> getCommentList(BoardVO boardVO) throws Exception {
+		return sqlSession.selectList(NAMESPACE + ".getCommentList", boardVO);
+	}
+	
+	@Override
+	public BoardVO getCountList(BoardVO boardVO) throws Exception {
+		return sqlSession.selectOne(NAMESPACE + ".getCountList", boardVO);
 	}
 
 	@Override
@@ -88,9 +93,7 @@ public class BoardServiceImplement implements BoardService {
 
 	@Override
 	public void board_count(BoardVO boardVO) {
-		try {
-			sqlSession.insert(NAMESPACE + ".board_count", boardVO);
-		}catch(Exception e) { }finally { }
+		sqlSession.insert(NAMESPACE + ".board_count", boardVO);
+		
 	}
-
 }

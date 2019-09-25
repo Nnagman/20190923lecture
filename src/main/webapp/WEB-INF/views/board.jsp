@@ -41,12 +41,14 @@
 	  </thead>
 	  <tbody>
 	  	<c:forEach var="row" items="${list}">
-		  	<tr>
-		      <td><a href="http://localhost:8080/board_detail?board_id=${row.board_id}&&id=${member.id}">${row.title}</a></td>
-		      <td>${row.id}</td>
-		      <td>${fn:substring(row.board_id, 0, 14)}</td>
-		      <td>${row.count}</td>
-		    </tr>
+	  		<c:if test="${row.is_delete == 0}">
+			  	<tr>
+			      <td><a href="http://localhost:8080/board_detail?board_id=${row.board_id}&&id=${member.id}">${row.title}</a></td>
+			      <td>${row.id}</td>
+			      <td>${fn:substring(row.board_id, 0, 14)}</td>
+			      <td>${row.count}</td>
+			    </tr>
+		    </c:if>
 	  	</c:forEach>
 	  </tbody>
 	</table>

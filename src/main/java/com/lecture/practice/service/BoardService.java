@@ -7,7 +7,8 @@ import com.lecture.practice.domain.CommentVO;
 
 public interface BoardService {
 	List<BoardVO> getBoardList() throws Exception;
-	List<CommentVO> getCommentList() throws Exception;
+	List<CommentVO> getCommentList(BoardVO boardVO) throws Exception;
+	BoardVO getCountList(BoardVO boardVO) throws Exception;
 	void board_write(BoardVO boardVO) throws Exception;
 	void comment_write(CommentVO commentVO) throws Exception;
 	void board_file(BoardVO boardVO) throws Exception;

@@ -38,48 +38,16 @@ public class BoardController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView board(Model model) throws Exception {
-		List<BoardVO> list = boardService.getBoardList();
-		List<CommentVO> list2 = boardService.getCommentList();
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("board");
-		mav.addObject("list", list);
-		mav.addObject("list2", list2);
-		mav.addObject("msg", "로그인을 해주세요.");
-		
-		return mav;
+		return board_list(model);
 	}
 	
 	@RequestMapping(value = "/board_detail", method = RequestMethod.GET)
 	public ModelAndView board_detail(Model model, BoardVO boardVO) throws Exception {
 		logger.info(boardVO.toString());
 		
-		if(boardVO.getId().equals("")) {
-			List<BoardVO> list = boardService.getBoardList();
-			List<CommentVO> list2 = boardService.getCommentList();
-			
-			ModelAndView mav = new ModelAndView();
-			mav.setViewName("board");
-			mav.addObject("list", list);
-			mav.addObject("list2", list2);
-			mav.addObject("msg", "로그인을 해주세요.");
-			
-			return mav;
-		}
+		if(boardVO.getId().equals("")) { return is_login(model); }
 		
-		boardService.board_count(boardVO);
-		BoardVO board_detail = boardService.board_detail(boardVO);
-		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
-		
-		if(board_file_detail != null) {
-			board_detail.setFile_name(board_file_detail.getFile_name());
-		}
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("board_detail");
-		mav.addObject("board_detail", board_detail);
-		
-		return mav;
+		return board_detail_function(model, boardVO);
 	}
 	
 	@RequestMapping(value = "/board_write", method = RequestMethod.GET)
@@ -94,49 +62,124 @@ public class BoardController {
         String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
 
         boardVO.setBoard_id(today + "/" + boardVO.getId());
-        
-        logger.info(boardVO.toString());
 		
 		if(boardVO.getFile_name() == null) {
-			logger.info("NO FILE");
 			boardService.board_write(boardVO);
 		}else {
-			logger.info("FILE EXIST");
 			boardService.board_write(boardVO);
 			boardService.board_file(boardVO);
 		}
+				
+		return board_detail_function(model, boardVO);
+	}
+	
+	@RequestMapping(value = "/comment_write", method = RequestMethod.POST)
+	public ModelAndView comment_writePOST(CommentVO commentVO) throws Exception {
+		Calendar calendar = Calendar.getInstance();
+        java.util.Date date = calendar.getTime();
+        String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
+        
+        BoardVO boardVO = new BoardVO();
+        boardVO.setBoard_id(commentVO.getBoard_id());
+        
+        logger.info(commentVO.toString());
+
+        commentVO.setComment_id(today + "/" + commentVO.getId());
+        boardService.comment_write(commentVO);
+        
+		BoardVO board_detail = boardService.board_detail(boardVO);
+		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
 		
+		if(board_file_detail != null) {
+			board_detail.setFile_name(board_file_detail.getFile_name());
+		}
+		
+		List<CommentVO> list = boardService.getCommentList(boardVO);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("board_detail");
+		mav.addObject("board_detail", board_detail);
+		mav.addObject("list", list);
+		
+		return mav;
+	}
+	
+	@RequestMapping(value = "/board_edit", method = RequestMethod.GET)
+	public ModelAndView board_editGET(Model model, BoardVO boardVO) throws Exception {
+		BoardVO board_detail = boardService.board_detail(boardVO);
+		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
+		
+		if(board_file_detail != null) {
+			board_detail.setFile_name(board_file_detail.getFile_name());
+		}
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("board_write");
+		mav.addObject("board_detail", board_detail);
+		mav.addObject("msg", "edit");
+		
+		return mav;
+	}
+	
+	@RequestMapping(value = "/board_edit", method = RequestMethod.POST)
+	public ModelAndView board_editPOST(Model model, BoardVO boardVO) throws Exception {
+		if(boardVO.getFile_name() == null) {
+			boardService.board_modify(boardVO);
+		}else {
+			boardService.board_modify(boardVO);
+			boardService.board_file_modify(boardVO);
+		}
+		
+		return board_detail_function(model, boardVO);
+	}
+	
+	@RequestMapping(value = "/board_delete", method = RequestMethod.GET)
+	public ModelAndView board_deleteGET(Model model, BoardVO boardVO) throws Exception {
+		boardService.board_delete(boardVO);
+		
+		return board_list(model);
+	}
+	
+	private ModelAndView board_detail_function(Model model, BoardVO boardVO) throws Exception {
+		BoardVO board_count = boardService.getCountList(boardVO);
+		
+		if(board_count == null) { boardService.board_count(boardVO); }
+		
+		BoardVO board_detail = boardService.board_detail(boardVO);
+		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
+		
+		if(board_file_detail != null) {
+			board_detail.setFile_name(board_file_detail.getFile_name());
+		}
+		
+		List<CommentVO> list = boardService.getCommentList(boardVO);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("board_detail");
+		mav.addObject("board_detail", board_detail);
+		mav.addObject("list", list);
+		
+		return mav;
+	}
+	
+	private ModelAndView is_login(Model model) throws Exception {
 		List<BoardVO> list = boardService.getBoardList();
-		List<CommentVO> list2 = boardService.getCommentList();
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("board");
 		mav.addObject("list", list);
-		mav.addObject("list2", list2);
 		mav.addObject("msg", "로그인을 해주세요.");
 		
 		return mav;
 	}
 	
-	@RequestMapping(value = "/comment_write", method = RequestMethod.POST)
-	public String comment_writePOST(CommentVO commentVO) throws Exception {
-		Calendar calendar = Calendar.getInstance();
-        java.util.Date date = calendar.getTime();
-        String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
-
-        commentVO.setComment_id(today + "/" + commentVO.getId());
+	private ModelAndView board_list(Model model) throws Exception {
+		List<BoardVO> list = boardService.getBoardList();
 		
-		return "board_write";
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("board");
+		mav.addObject("list", list);
+		
+		return mav;
 	}
-	
-	@RequestMapping(value = "/board_edit", method = RequestMethod.GET)
-	public String board_editGET() {
-		return "board_edit";
-	}
-	
-	@RequestMapping(value = "/board_edit", method = RequestMethod.POST)
-	public String board_editPOST() {
-		return "board_edit";
-	}
-	
 }

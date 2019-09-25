@@ -47,16 +47,7 @@ public class MemberController {
 		
 		httpSession.setAttribute("member", member);
 		
-		List<BoardVO> list = boardService.getBoardList();
-		List<CommentVO> list2 = boardService.getCommentList();
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("board");
-		mav.addObject("list", list);
-		mav.addObject("list2", list2);
-		mav.addObject("msg", "로그인을 해주세요.");
-		
-		return mav;
+		return board_list(model);
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
@@ -65,16 +56,7 @@ public class MemberController {
 		
 		httpSession.removeAttribute("member");
 		
-		List<BoardVO> list = boardService.getBoardList();
-		List<CommentVO> list2 = boardService.getCommentList();
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("board");
-		mav.addObject("list", list);
-		mav.addObject("list2", list2);
-		mav.addObject("msg", "로그인을 해주세요.");
-		
-		return mav;
+		return board_list(model);
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.GET)
@@ -86,14 +68,15 @@ public class MemberController {
 	public ModelAndView registerPOST(Model model, MemberVO memberVO) throws Exception {
 		memberService.register(memberVO);
 		
+		return board_list(model);
+	}
+	
+	private ModelAndView board_list(Model model) throws Exception {
 		List<BoardVO> list = boardService.getBoardList();
-		List<CommentVO> list2 = boardService.getCommentList();
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("board");
 		mav.addObject("list", list);
-		mav.addObject("list2", list2);
-		mav.addObject("msg", "로그인을 해주세요.");
 		
 		return mav;
 	}

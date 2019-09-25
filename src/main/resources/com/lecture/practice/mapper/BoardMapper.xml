@@ -14,6 +14,13 @@
 		FROM board_comment
 		WHERE board_id = #{board_id}
 	</select>
+	
+	<select id="getCountList" resultType="com.lecture.practice.domain.BoardVO">
+		SELECT *
+		FROM board_count
+		WHERE board_id = #{board_id}
+		AND id = #{id}
+	</select>
 
 	<insert id="board_write" >
 		<![CDATA[
@@ -73,7 +80,7 @@
 	<update id="board_modify" >
 		<![CDATA[
 		update board
-		SET title = #{title}
+		SET title = #{title},
 			content = #{content}
 		WHERE board_id = #{board_id}
 		]]>
@@ -95,7 +102,7 @@
 		]]>
 	</update>
 	
-	<update id="board_count" >
+	<update id="board_count">
 		<![CDATA[
 		INSERT INTO board_count( board_id, id ) VALUES ( #{board_id}, #{id} )
 		]]>
