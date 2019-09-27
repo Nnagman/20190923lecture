@@ -1,19 +1,31 @@
 package com.lecture.practice.controller;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.ServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.lecture.practice.util.UploadFileUtils;
 import com.lecture.practice.domain.BoardVO;
 import com.lecture.practice.domain.CommentVO;
 import com.lecture.practice.service.BoardService;
@@ -55,8 +67,34 @@ public class BoardController {
 		return "board_write";
 	}
 	
+	@RequestMapping(value = "/board_file_upload", method = RequestMethod.POST)
+	public String board_file_uploadPOST() {	
+		return "board_write";
+	}
+	
 	@RequestMapping(value = "/board_write", method = RequestMethod.POST)
-	public ModelAndView board_writePOST(Model model, BoardVO boardVO) throws Exception {
+	public ModelAndView board_writePOST(Model model,@RequestParam(value="form") BoardVO boardVO, 
+			@RequestParam(value="formData") MultipartHttpServletRequest multipartRequest, ServletRequest request) throws Exception {
+		logger.info("upload");
+		Iterator<String> itr = multipartRequest.getFileNames();
+		List<String> str_list = new ArrayList<String>();
+		
+		while (itr.hasNext()) {
+			MultipartFile mpf = multipartRequest.getFile(itr.next());
+	 
+	        String originalFilename = mpf.getOriginalFilename();
+	        
+	        String uploadPath = request.getServletContext().getRealPath("/resources");
+	 
+	        String fileFullPath = uploadPath+"/image/"+originalFilename;
+	        
+	        logger.info(fileFullPath);
+	        
+	        //mpf.transferTo(new File(fileFullPath));
+	        str_list.add(UploadFileUtils.uploadFile(uploadPath, originalFilename, mpf.getBytes(), "/image"));
+		}
+		
+		
 		Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
         String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
@@ -68,6 +106,18 @@ public class BoardController {
 		}else {
 			boardService.board_write(boardVO);
 			boardService.board_file(boardVO);
+		}
+		
+		if(str_list != null) {
+			BoardVO file_boardVO = new BoardVO();
+			
+			Iterator<String> iterator = str_list.iterator();
+			while(iterator.hasNext()) {
+				file_boardVO.setBoard_id(boardVO.getBoard_id());
+				file_boardVO.setFile_name(iterator.next().toString());
+				
+				boardService.board_file(file_boardVO);
+			}
 		}
 				
 		return board_detail_function(model, boardVO);
