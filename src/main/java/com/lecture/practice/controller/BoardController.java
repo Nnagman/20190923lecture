@@ -1,31 +1,31 @@
 package com.lecture.practice.controller;
 
-import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.lecture.practice.util.UploadFileUtils;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+
 import com.lecture.practice.domain.BoardVO;
 import com.lecture.practice.domain.CommentVO;
 import com.lecture.practice.service.BoardService;
@@ -67,17 +67,16 @@ public class BoardController {
 		return "board_write";
 	}
 	
-	@RequestMapping(value = "/board_file_upload", method = RequestMethod.POST)
-	public String board_file_uploadPOST() {	
+	@RequestMapping(value = "/board_file", method = RequestMethod.POST)
+	public String board_filePOST() {	
 		return "board_write";
 	}
 	
-	@RequestMapping(value = "/board_write", method = RequestMethod.POST)
-	public ModelAndView board_writePOST(Model model,@RequestParam(value="form") BoardVO boardVO, 
-			@RequestParam(value="formData") MultipartHttpServletRequest multipartRequest, ServletRequest request) throws Exception {
+	@RequestMapping(value = "/board_file_upload", method = RequestMethod.POST)
+	public @ResponseBody String board_file_uploadPOST(MultipartHttpServletRequest multipartRequest, ServletRequest request) throws IOException, Exception {	
 		logger.info("upload");
 		Iterator<String> itr = multipartRequest.getFileNames();
-		List<String> str_list = new ArrayList<String>();
+		String str = new String();
 		
 		while (itr.hasNext()) {
 			MultipartFile mpf = multipartRequest.getFile(itr.next());
@@ -85,14 +84,41 @@ public class BoardController {
 	        String originalFilename = mpf.getOriginalFilename();
 	        
 	        String uploadPath = request.getServletContext().getRealPath("/resources");
-	 
-	        String fileFullPath = uploadPath+"/image/"+originalFilename;
 	        
-	        logger.info(fileFullPath);
-	        
-	        //mpf.transferTo(new File(fileFullPath));
-	        str_list.add(UploadFileUtils.uploadFile(uploadPath, originalFilename, mpf.getBytes(), "/image"));
+	        if(str.equals("")) {
+	        	str = UploadFileUtils.uploadFile(uploadPath, originalFilename, mpf.getBytes(), "/image");
+	        	str = str.substring(str.indexOf("image/")-1);
+	        }else {
+	        	String temp = UploadFileUtils.uploadFile(uploadPath, originalFilename, mpf.getBytes(), "/image");
+	        	temp = temp.substring(temp.indexOf("image/")-1);
+	        	str += "&&";
+	        	
+	        	str += temp;
+	        }
 		}
+		
+		logger.info(str);
+		return str;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value= "/board_file_delete", method = RequestMethod.POST)
+	public JSON board_file_deletePOST(@RequestBody String file_name) throws Exception {
+		BoardVO boardVO = new BoardVO();
+		
+		boardVO.setFile_name(file_name);
+		
+		logger.info(boardVO.toString());
+		
+		boardService.board_file_delete(boardVO);
+		
+		JSONObject json = new JSONObject();
+		json.put("message", "삭제 성공");
+		return json;
+	}
+	
+	@RequestMapping(value = "/board_write", method = RequestMethod.POST)
+	public ModelAndView board_writePOST(Model model, BoardVO boardVO) throws Exception {
 		
 		
 		Calendar calendar = Calendar.getInstance();
@@ -100,23 +126,20 @@ public class BoardController {
         String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
 
         boardVO.setBoard_id(today + "/" + boardVO.getId());
+        
+        boardService.board_write(boardVO);
 		
-		if(boardVO.getFile_name() == null) {
-			boardService.board_write(boardVO);
-		}else {
-			boardService.board_write(boardVO);
-			boardService.board_file(boardVO);
-		}
-		
-		if(str_list != null) {
-			BoardVO file_boardVO = new BoardVO();
+		if(!boardVO.getFile_name().equals("")) {
+			String[] str_array = boardVO.getFile_name().split("&&");
+			String board_id = boardVO.getBoard_id();
 			
-			Iterator<String> iterator = str_list.iterator();
-			while(iterator.hasNext()) {
-				file_boardVO.setBoard_id(boardVO.getBoard_id());
-				file_boardVO.setFile_name(iterator.next().toString());
+			for(String file_name : str_array) {
+				logger.info(file_name);
+				BoardVO board_fileVO = new BoardVO();
+				board_fileVO.setFile_name(file_name);
+				board_fileVO.setBoard_id(board_id);
 				
-				boardService.board_file(file_boardVO);
+				boardService.board_file(board_fileVO);
 			}
 		}
 				
@@ -124,7 +147,7 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/comment_write", method = RequestMethod.POST)
-	public ModelAndView comment_writePOST(CommentVO commentVO) throws Exception {
+	public ModelAndView comment_writePOST(Model model, CommentVO commentVO) throws Exception {
 		Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
         String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
@@ -137,35 +160,17 @@ public class BoardController {
         commentVO.setComment_id(today + "/" + commentVO.getId());
         boardService.comment_write(commentVO);
         
-		BoardVO board_detail = boardService.board_detail(boardVO);
-		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
-		
-		if(board_file_detail != null) {
-			board_detail.setFile_name(board_file_detail.getFile_name());
-		}
-		
-		List<CommentVO> list = boardService.getCommentList(boardVO);
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("board_detail");
-		mav.addObject("board_detail", board_detail);
-		mav.addObject("list", list);
-		
-		return mav;
+        return board_detail_function(model, boardVO);
 	}
 	
 	@RequestMapping(value = "/board_edit", method = RequestMethod.GET)
 	public ModelAndView board_editGET(Model model, BoardVO boardVO) throws Exception {
 		BoardVO board_detail = boardService.board_detail(boardVO);
-		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
-		
-		if(board_file_detail != null) {
-			board_detail.setFile_name(board_file_detail.getFile_name());
-		}
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("board_write");
 		mav.addObject("board_detail", board_detail);
+		mav.addObject("file_list", boardService.board_file_detail(boardVO));
 		mav.addObject("msg", "edit");
 		
 		return mav;
@@ -173,11 +178,20 @@ public class BoardController {
 	
 	@RequestMapping(value = "/board_edit", method = RequestMethod.POST)
 	public ModelAndView board_editPOST(Model model, BoardVO boardVO) throws Exception {
-		if(boardVO.getFile_name() == null) {
-			boardService.board_modify(boardVO);
-		}else {
-			boardService.board_modify(boardVO);
-			boardService.board_file_modify(boardVO);
+		boardService.board_modify(boardVO);
+		
+		if(!boardVO.getFile_name().equals("")) {
+			String[] str_array = boardVO.getFile_name().split("&&");
+			String board_id = boardVO.getBoard_id();
+			
+			for(String file_name : str_array) {
+				logger.info(file_name);
+				BoardVO board_fileVO = new BoardVO();
+				board_fileVO.setFile_name(file_name);
+				board_fileVO.setBoard_id(board_id);
+				
+				boardService.board_file(board_fileVO);
+			}
 		}
 		
 		return board_detail_function(model, boardVO);
@@ -196,17 +210,13 @@ public class BoardController {
 		if(board_count == null) { boardService.board_count(boardVO); }
 		
 		BoardVO board_detail = boardService.board_detail(boardVO);
-		BoardVO board_file_detail = boardService.board_file_detail(boardVO);
-		
-		if(board_file_detail != null) {
-			board_detail.setFile_name(board_file_detail.getFile_name());
-		}
 		
 		List<CommentVO> list = boardService.getCommentList(boardVO);
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("board_detail");
 		mav.addObject("board_detail", board_detail);
+		mav.addObject("file_list", boardService.board_file_detail(boardVO));
 		mav.addObject("list", list);
 		
 		return mav;

@@ -1,17 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%> 
 <!DOCTYPE html>
 <html>
 <head>
 <title>board_register</title>
+
 </head>
 <body>
 	<%@ include file="header.jsp"%>
-	
 	<P>  Board Detail </P>
-	
+	Title<br>
 	<p>${board_detail.title}</p>
+	Content<br>
 	<div>${board_detail.content}</div>
+	<c:forEach var="file" items="${file_list}" > 
+		<span class="viewImg">
+			<img style="width: 400px; height: 400px;" src="<spring:url value='/resources${file.file_name}' />" />				
+		</span>
+	</c:forEach>
 	<c:if test="${board_detail.id == member.id}">
 		<a href="http://localhost:8080/board_edit?board_id=${board_detail.board_id}">EDIT</a>
 		<a href="http://localhost:8080/board_delete?board_id=${board_detail.board_id}">DELETE</a>

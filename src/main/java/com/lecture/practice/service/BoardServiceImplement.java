@@ -57,8 +57,8 @@ public class BoardServiceImplement implements BoardService {
 	}
 	
 	@Override
-	public BoardVO board_file_detail(BoardVO boardVO) throws Exception {
-		return sqlSession.selectOne(NAMESPACE + ".board_file_detail", boardVO);
+	public List<BoardVO> board_file_detail(BoardVO boardVO) throws Exception {
+		return sqlSession.selectList(NAMESPACE + ".board_file_detail", boardVO);
 	}
 
 	@Override
