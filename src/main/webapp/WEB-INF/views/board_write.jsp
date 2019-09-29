@@ -51,9 +51,7 @@
 		});
 	});
 	
-	$(document).on("click" ,".file_delete" ,function(){
-		alert($(this).attr('id'));
-		
+	$(document).on("click" ,".file_delete" ,function(){	
 		var element = this;
 		var file_name = $(this).attr('id');
 		

@@ -103,7 +103,7 @@ public class BoardController {
 	
 	@ResponseBody
 	@RequestMapping(value= "/board_file_delete", method = RequestMethod.POST)
-	public JSON board_file_deletePOST(@RequestBody String file_name) throws Exception {
+	public JSON board_file_deletePOST(@RequestBody String file_name, ServletRequest request) throws Exception {
 		BoardVO boardVO = new BoardVO();
 		
 		boardVO.setFile_name(file_name);
@@ -111,6 +111,8 @@ public class BoardController {
 		logger.info(boardVO.toString());
 		
 		boardService.board_file_delete(boardVO);
+		
+		UploadFileUtils.deleteFile(file_name, request);
 		
 		JSONObject json = new JSONObject();
 		json.put("message", "삭제 성공");

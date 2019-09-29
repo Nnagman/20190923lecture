@@ -5,8 +5,14 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
+import javax.servlet.ServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 public class UploadFileUtils {
 
@@ -63,8 +69,6 @@ public class UploadFileUtils {
 	   // 디렉토리 생성
 	private static void makeDir(String uploadPath, String... paths) {
 		
-
-		
         // 디렉토리가 존재하면
 		if (new File(paths[paths.length - 1]).exists()){
 //			System.out.println("paths: " + paths + ", paths.length - 1: " + paths[paths.length - 1]);
@@ -82,14 +86,10 @@ public class UploadFileUtils {
 			}
 		}
 	}	
-		
-	// 아이콘 생성
-	private static String makeIcon(String uploadPath, String path, String fileName) throws Exception {
-		// 아이콘의 이름
-		String iconName = uploadPath + path + File.separator + fileName;
-		// 아이콘 이름을 리턴
-		// File.separatorChar : 디렉토리 구분자
-		// 윈도우 \ , 유닉스(리눅스) / 		
-		return iconName.substring(uploadPath.length()).replace(File.separatorChar, '/');
-	}
+	
+    public static void deleteFile(String file_Name, ServletRequest request) throws Exception {
+    	String uploadPath = request.getServletContext().getRealPath("/resources");
+
+        new File(uploadPath + file_Name.replace('/', File.separatorChar)).delete();
+    }
 }
