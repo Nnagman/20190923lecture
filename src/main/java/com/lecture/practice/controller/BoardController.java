@@ -55,6 +55,7 @@ public class BoardController {
 	
 	@RequestMapping(value = "/board_detail", method = RequestMethod.GET)
 	public ModelAndView board_detail(Model model, BoardVO boardVO) throws Exception {
+		logger.info("board_detail");
 		logger.info(boardVO.toString());
 		
 		if(boardVO.getId().equals("")) { return is_login(model); }
@@ -149,20 +150,44 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/comment_write", method = RequestMethod.POST)
-	public ModelAndView comment_writePOST(Model model, CommentVO commentVO) throws Exception {
+	public ModelAndView comment_writePOST(Model model, CommentVO commentVO) throws Exception {	
 		Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
         String today = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
         
         BoardVO boardVO = new BoardVO();
         boardVO.setBoard_id(commentVO.getBoard_id());
-        
-        logger.info(commentVO.toString());
+        boardVO.setId(commentVO.getId());
 
         commentVO.setComment_id(today + "/" + commentVO.getId());
+        
         boardService.comment_write(commentVO);
         
         return board_detail_function(model, boardVO);
+	}
+	
+	@RequestMapping(value = "/comment_delete", method = RequestMethod.GET)
+	public ModelAndView comment_deleteGET(Model model, CommentVO commentVO) throws Exception {
+		boardService.comment_delete(commentVO);
+		
+		BoardVO boardVO = new BoardVO();
+        boardVO.setBoard_id(commentVO.getBoard_id());
+        boardVO.setId(commentVO.getId());
+		
+		return board_detail_function(model, boardVO);
+	}
+	
+	@RequestMapping(value = "/comment_modify", method = RequestMethod.POST)
+	public ModelAndView comment_modifyPOST(Model model, CommentVO commentVO) throws Exception {
+		logger.info(commentVO.toString());
+		
+		boardService.comment_modify(commentVO);
+		
+		BoardVO boardVO = new BoardVO();
+        boardVO.setBoard_id(commentVO.getBoard_id());
+        boardVO.setId(commentVO.getId());
+		
+		return board_detail_function(model, boardVO);
 	}
 	
 	@RequestMapping(value = "/board_edit", method = RequestMethod.GET)
