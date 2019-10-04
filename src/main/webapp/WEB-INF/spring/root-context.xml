@@ -14,7 +14,7 @@
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
-		<property name="url" value="jdbc:log4jdbc:oracle:thin:@database-1.c7pungzjxhk2.ap-northeast-2.rds.amazonaws.com:1521/PRACTICE"></property>
+		<property name="url" value="jdbc:log4jdbc:oracle:thin:@practice.c7pungzjxhk2.ap-northeast-2.rds.amazonaws.com:1521/PRACTICE"></property>
 		<property name="username" value="practice"></property>
 		<property name="password" value="7895admin"></property>
 	</bean>
