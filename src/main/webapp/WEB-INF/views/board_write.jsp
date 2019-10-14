@@ -17,19 +17,19 @@
 	
 	$(document).ready(function() {
 		
-		var myDropzone = new Dropzone("div#dZUpload", 
-				
+		var myDropzone = new Dropzone("div#dZUpload", 	
 			{ 	url: "/board_file",
 				addRemoveLinks :true,
-				success: function(file){
-					formData.append(file.name, dataURLtoBlob(file.dataURL), file.name);
-					console.log(formData.get(file.name));
-				},
 				removedfile: function(file) {
 					formData.delete(file.name);
 					file.previewElement.remove();
 				}
 			});
+		
+		myDropzone.on("thumbnail", function(file){
+			formData.append(file.name, dataURLtoBlob(file.dataURL), file.name);
+			console.log(file.dataURL);
+		});
 	});
 	
 	$(document).on("click", "#write", function(){
