@@ -10,7 +10,6 @@
 	
 	<script src="http://code.jquery.com/jquery-3.4.0.min.js"></script>
 	<script src="resources/js/datatables.min.js"></script>
-	
 	<link href="resources/css/bootstrap.min.css" rel="stylesheet">
 	
 	<script>
@@ -26,11 +25,11 @@
 		} );
 	</script>
 </head>
-<body>
+<body class="jumbotron">
 	<%@ include file="header.jsp"%>
-	<P> Board </P>
+	<h2> Board </h2>
 	
-	<table class="table" id="board">
+	<table class="table table-hover" id="board">
 	  <thead>
 	    <tr>
 	      <th scope="col">Title</th>

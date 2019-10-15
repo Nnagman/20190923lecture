@@ -9,6 +9,8 @@
 	<script src="http://code.jquery.com/jquery-3.4.0.min.js"></script>
 	<script src="resources/js/dropzone.js"></script>
 	<link href="resources/css/dropzone.css" rel="stylesheet">
+	<script src="resources/js/datatables.min.js"></script>
+	<link href="resources/css/bootstrap.min.css" rel="stylesheet">
 	
 	<script>
 	Dropzone.autoDiscover = false;
@@ -97,19 +99,19 @@
 	}
 	</script>
 </head>
-<body>
+<body  class="jumbotron">
 	<%@ include file="header.jsp"%>
 	
 	<c:if test='${msg == null}'>
-		<P>  Board Write </P>
+		<legend>  Board Write </legend>
 		<form method="POST" action="http://localhost:8080/board_write" id="board_form">
 			<input type="hidden" name="id" id="id" value="${member.id}"/>
-			Title<br>
-			<input type="text" name="title" id="title"/><br>
-			Content<br>
-			<input type="text" name="content" id="content"/><br>
+			<h3>Title</h3><br>
+			<input class="form-control" type="text" name="title" id="title"/><br>
+			<h3>Content</h3><br>
+			<input class="form-control" type="text" name="content" id="content"/><br>
 		</form>
-		<button id="write">WRITE</button>
+		<button class="btn btn-primary" id="write">WRITE</button>
 		<div class="outerDorpzone">
 			<br />
 			<div id="dZUpload" class="dropzone">
@@ -118,14 +120,14 @@
 		</div>
 	</c:if>
 	<c:if test='${msg == "edit"}'>
-		<P>  Board Edit </P>
+		<legend>  Board Edit </legend>
 		<form method="POST" action="http://localhost:8080/board_edit" id="board_form">
 			<input type="hidden" name="id" id="id" value="${board_detail.id}"/>
 			<input type="hidden" name="board_id" id="board_id" value="${board_detail.board_id}"/>
-			Title<br>
-			<input type="text" name="title" id="title" value="${board_detail.title}"/><br>
-			Content<br>
-			<input type="text" name="content" id="content" value="${board_detail.content}"/><br>
+			<h3>Title</h3><br>
+			<input class="form-control" type="text" name="title" id="title" value="${board_detail.title}"/><br>
+			<h3>Content</h3><br>
+			<input class="form-control" type="text" name="content" id="content" value="${board_detail.content}"/><br>
 		</form>
 		<c:forEach var="file" items="${file_list}" > 
 			<span>
@@ -133,7 +135,7 @@
 				<button id="${file.file_name}" class="file_delete">DELETE FILE</button>			
 			</span>
 		</c:forEach>
-		<button id="edit">EDIT</button>
+		<button class="btn btn-primary" id="edit">EDIT</button>
 		<div class="outerDorpzone">
 			<br />
 			<div id="dZUpload" class="dropzone">

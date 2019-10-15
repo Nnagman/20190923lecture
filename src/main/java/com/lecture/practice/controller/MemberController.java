@@ -45,18 +45,23 @@ public class MemberController {
 		
 		MemberVO member = memberService.login(memberVO);
 		
-		httpSession.setAttribute("member", member);
-		
-		return board_list(model);
+		if(member != null) {
+			httpSession.setAttribute("member", member);
+			return board_list(model);
+		}else {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("main");
+			return mav;
+		}
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public ModelAndView logoutGET(Model model, HttpServletRequest request) throws Exception {
+	public String logoutGET(Model model, HttpServletRequest request) throws Exception {
 		HttpSession httpSession = request.getSession();
 		
 		httpSession.removeAttribute("member");
 		
-		return board_list(model);
+		return "main";
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.GET)
@@ -65,10 +70,10 @@ public class MemberController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ModelAndView registerPOST(Model model, MemberVO memberVO) throws Exception {
+	public String registerPOST(Model model, MemberVO memberVO) throws Exception {
 		memberService.register(memberVO);
 		
-		return board_list(model);
+		return "main";
 	}
 	
 	private ModelAndView board_list(Model model) throws Exception {

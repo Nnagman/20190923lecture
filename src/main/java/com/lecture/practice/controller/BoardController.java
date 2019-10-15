@@ -49,6 +49,11 @@ public class BoardController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String main() throws Exception {
+		return "main";
+	}
+	
+	@RequestMapping(value = "/board", method = RequestMethod.GET)
 	public ModelAndView board(Model model) throws Exception {
 		return board_list(model);
 	}
