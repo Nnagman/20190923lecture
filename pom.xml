@@ -147,7 +147,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.9.8</version>
+			<version>2.9.10.3</version>
 		</dependency>
 
 		<!-- 스프링에서 JDBC 를 사용하기 위한 라이브러리 입니다. -->
